@@ -4,7 +4,395 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>PokéBattle Universe</title>
-    <link rel="stylesheet" href="styles.css" />
+    <style>
+      :root {
+        --bg-1: #0b1020;
+        --bg-2: #101c32;
+        --panel: rgba(15, 23, 42, 0.82);
+        --panel-soft: rgba(30, 41, 59, 0.9);
+        --line: rgba(148, 163, 184, 0.2);
+        --text: #e5edf9;
+        --muted: #9fb0d0;
+        --yellow: #facc15;
+        --blue: #7dd3fc;
+        --green: #4ade80;
+        --red: #f87171;
+        --shadow: 0 25px 60px rgba(8, 15, 28, 0.38);
+      }
+
+      * { box-sizing: border-box; }
+
+      html, body {
+        margin: 0;
+        min-height: 100%;
+        background: radial-gradient(circle at top, rgba(56, 189, 248, 0.22), transparent 28%), linear-gradient(180deg, var(--bg-1), var(--bg-2));
+        color: var(--text);
+        font-family: Inter, "Segoe UI", sans-serif;
+      }
+
+      body { padding: 22px; }
+      button, select { font: inherit; }
+      button { cursor: pointer; }
+
+      .app-shell { max-width: 1500px; margin: 0 auto; }
+
+      .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+        padding: 4px 8px 18px;
+      }
+
+      .brand-wrap h1 { margin: 0; font-size: clamp(2.2rem, 4vw, 3.2rem); }
+
+      .eyebrow {
+        margin: 0 0 6px;
+        text-transform: uppercase;
+        letter-spacing: 0.15em;
+        color: var(--blue);
+        font-size: 0.72rem;
+        font-weight: 800;
+      }
+
+      .top-actions {
+        display: flex;
+        align-items: flex-end;
+        justify-content: flex-end;
+        flex-wrap: wrap;
+        gap: 14px;
+      }
+
+      .stats-bar {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      .stat-pill {
+        min-width: 102px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        background: rgba(8, 47, 73, 0.38);
+        border: 1px solid var(--line);
+        border-radius: 13px;
+        padding: 8px 12px;
+        box-shadow: var(--shadow);
+      }
+
+      .stat-pill span {
+        font-size: 0.72rem;
+        color: var(--muted);
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+
+      .stat-pill strong { font-size: 1.2rem; font-weight: 800; }
+
+      .action-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .primary-btn, .secondary-btn, .mini-btn {
+        border-radius: 12px;
+        transition: transform 0.2s ease, filter 0.2s ease;
+      }
+
+      .primary-btn {
+        border: none;
+        background: linear-gradient(135deg, #facc15, #f59e0b);
+        color: #111827;
+        padding: 11px 18px;
+        font-weight: 800;
+        box-shadow: 0 12px 30px rgba(245, 158, 11, 0.2);
+      }
+
+      .secondary-btn, .mini-btn {
+        border: 1px solid var(--line);
+        background: rgba(14, 116, 144, 0.15);
+        color: var(--text);
+        padding: 10px 14px;
+      }
+
+      .primary-btn:hover, .secondary-btn:hover, .mini-btn:hover {
+        filter: brightness(1.08);
+        transform: translateY(-1px);
+      }
+
+      .game-layout {
+        display: grid;
+        grid-template-columns: minmax(280px, 1.2fr) minmax(300px, 1fr) minmax(280px, 1.2fr);
+        gap: 18px;
+        align-items: start;
+      }
+
+      .panel, .battle-panel {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 24px;
+        box-shadow: var(--shadow);
+      }
+
+      .team-panel { padding: 14px; }
+
+      .panel-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 14px;
+      }
+
+      .panel-head h2 { margin: 0; font-size: 1.25rem; }
+
+      .team-grid { display: grid; gap: 12px; }
+
+      .team-card {
+        background: rgba(15, 23, 42, 0.7);
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        padding: 12px;
+      }
+
+      .card-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        margin-bottom: 10px;
+      }
+
+      .card-badge {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 800;
+        color: #11212f;
+        background: linear-gradient(135deg, var(--yellow), #f59e0b);
+      }
+
+      .card-name {
+        flex: 1;
+        font-weight: 700;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .team-card select {
+        width: 100%;
+        background: rgba(2, 6, 23, 0.75);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        color: var(--text);
+        padding: 9px 10px;
+        margin-top: 6px;
+      }
+
+      .team-card .config-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        margin-top: 8px;
+      }
+
+      .team-card .label {
+        display: block;
+        margin-top: 8px;
+        color: var(--muted);
+        font-size: 0.72rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+      }
+
+      .battle-panel {
+        padding: 18px;
+        min-height: 760px;
+      }
+
+      .battle-status {
+        background: rgba(30, 41, 59, 0.9);
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 12px 14px;
+        font-weight: 700;
+        margin-bottom: 18px;
+      }
+
+      .battle-arena {
+        display: grid;
+        grid-template-columns: 1fr auto 1fr;
+        align-items: center;
+        gap: 18px;
+        padding: 10px 4px 18px;
+      }
+
+      .duel-card {
+        background: linear-gradient(180deg, rgba(15, 23, 42, 0.9), rgba(8, 47, 73, 0.2));
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        padding: 16px;
+        min-height: 240px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+      }
+
+      .duel-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .tag {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 5px 9px;
+        border-radius: 999px;
+        background: rgba(59, 130, 246, 0.14);
+        border: 1px solid rgba(125, 211, 252, 0.3);
+        font-size: 0.72rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+      }
+
+      .tag.alt {
+        background: rgba(248, 113, 113, 0.12);
+        border-color: rgba(248, 113, 113, 0.28);
+      }
+
+      .battle-sprite {
+        display: grid;
+        place-items: center;
+        width: 110px;
+        height: 110px;
+        margin: 10px auto;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(255,255,255,0.38), rgba(148,163,184,0.06));
+        box-shadow: inset 0 0 25px rgba(255,255,255,0.18);
+        font-size: 4rem;
+        animation: floaty 2.8s ease-in-out infinite;
+      }
+
+      .player-sprite { color: var(--blue); }
+      .bot-sprite { color: var(--green); }
+
+      @keyframes floaty {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-10px); }
+      }
+
+      .hp-block { display: flex; flex-direction: column; gap: 8px; }
+      .hp-row {
+        display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--muted);
+      }
+
+      .hp-bar {
+        width: 100%;
+        height: 14px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(148, 163, 184, 0.2);
+        overflow: hidden;
+      }
+
+      .hp-bar span {
+        display: block;
+        height: 100%;
+        width: 100%;
+        background: linear-gradient(90deg, var(--green), #a3e635);
+        border-radius: inherit;
+        transition: width 0.35s ease;
+      }
+
+      .enemy-bar span { background: linear-gradient(90deg, #f87171, #fca5a5); }
+
+      .versus {
+        display: grid;
+        place-items: center;
+        width: 58px;
+        height: 58px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, rgba(250, 204, 21, 0.26), rgba(59, 130, 246, 0.2));
+        border: 1px solid var(--line);
+        font-weight: 900;
+        color: var(--yellow);
+      }
+
+      .move-bar {
+        min-height: 90px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 8px;
+        margin-bottom: 16px;
+      }
+
+      .move-chip {
+        flex: 1 1 160px;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 10px 12px;
+        background: rgba(15, 23, 42, 0.8);
+        color: var(--text);
+        text-align: left;
+      }
+
+      .move-chip strong { display: block; margin-bottom: 4px; color: var(--yellow); }
+
+      .battle-log-wrap {
+        background: rgba(15, 23, 42, 0.64);
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        overflow: hidden;
+      }
+
+      .battle-log-header {
+        padding: 12px 14px;
+        border-bottom: 1px solid var(--line);
+        font-weight: 700;
+        background: rgba(15, 118, 110, 0.1);
+      }
+
+      .battle-log {
+        max-height: 210px;
+        overflow-y: auto;
+        padding: 10px 12px 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .log-entry {
+        background: rgba(15, 23, 42, 0.72);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 8px 9px;
+        line-height: 1.4;
+        color: var(--text);
+      }
+
+      .log-entry strong { color: var(--yellow); }
+
+      @media (max-width: 1120px) {
+        .game-layout { grid-template-columns: 1fr; }
+        .topbar { flex-direction: column; align-items: stretch; }
+        .top-actions { justify-content: space-between; }
+      }
+
+      @media (max-width: 640px) {
+        body { padding: 14px; }
+        .battle-arena { grid-template-columns: 1fr; }
+        .versus { margin: 0 auto; }
+      }
+    </style>
   </head>
   <body>
     <div class="app-shell">
@@ -110,6 +498,529 @@
       </main>
     </div>
 
-    <script src="app.js"></script>
+    <script>
+      const MAX_TEAM_SIZE = 6;
+      const POKEMON_COUNT = 1025;
+      const MOVE_COUNT = 934;
+      const ITEM_COUNT = 571;
+      const ABILITY_COUNT = 125;
+
+      const TYPE_CHART = {
+        Normal: { Rock: 0.5, Ghost: 0, Steel: 0.5 },
+        Fire: { Fire: 0.5, Water: 0.5, Grass: 2, Ice: 2, Bug: 2, Rock: 0.5, Dragon: 0.5, Steel: 2 },
+        Water: { Fire: 2, Water: 0.5, Grass: 0.5, Ground: 2, Rock: 2, Dragon: 0.5 },
+        Electric: { Water: 2, Electric: 0.5, Grass: 0.5, Ground: 0, Flying: 2, Dragon: 0.5 },
+        Grass: { Fire: 0.5, Water: 2, Grass: 0.5, Poison: 0.5, Ground: 2, Flying: 0.5, Bug: 0.5, Rock: 2, Dragon: 0.5, Steel: 0.5 },
+        Ice: { Fire: 0.5, Water: 0.5, Grass: 2, Ice: 0.5, Ground: 2, Flying: 2, Dragon: 2, Steel: 0.5 },
+        Fighting: { Normal: 2, Ice: 2, Poison: 0.5, Flying: 0.5, Psychic: 0.5, Bug: 0.5, Rock: 2, Ghost: 0, Dark: 2, Steel: 2, Fairy: 0.5 },
+        Poison: { Grass: 2, Poison: 0.5, Ground: 0.5, Rock: 0.5, Ghost: 0.5, Steel: 0, Fairy: 2 },
+        Ground: { Fire: 2, Electric: 2, Grass: 0.5, Poison: 2, Flying: 0, Bug: 0.5, Rock: 2, Steel: 2 },
+        Flying: { Electric: 0.5, Grass: 2, Fighting: 2, Bug: 2, Rock: 0.5, Steel: 0.5 },
+        Psychic: { Fighting: 2, Poison: 2, Psychic: 0.5, Dark: 0, Steel: 0.5 },
+        Bug: { Fire: 0.5, Grass: 2, Fighting: 0.5, Poison: 0.5, Flying: 0.5, Psychic: 2, Ghost: 0.5, Dark: 2, Steel: 0.5, Fairy: 0.5 },
+        Rock: { Fire: 2, Ice: 2, Fighting: 0.5, Ground: 0.5, Flying: 2, Bug: 2, Steel: 0.5 },
+        Ghost: { Normal: 0, Psychic: 0.5, Ghost: 2, Dark: 0.5 },
+        Dragon: { Dragon: 2, Steel: 0.5, Fairy: 0 },
+        Dark: { Fighting: 0.5, Psychic: 2, Ghost: 2, Fairy: 0.5 },
+        Steel: { Fire: 0.5, Water: 0.5, Electric: 0.5, Ice: 2, Rock: 2, Steel: 0.5, Fairy: 2 },
+        Fairy: { Fire: 0.5, Fighting: 2, Poison: 0.5, Dragon: 2, Dark: 2, Steel: 0.5 }
+      };
+
+      const BASE_NAMES = [
+        'Bulbasaur', 'Ivysaur', 'Venusaur', 'Charmander', 'Charmeleon', 'Charizard', 'Squirtle', 'Wartortle', 'Blastoise', 'Caterpie', 'Metapod', 'Butterfree', 'Weedle', 'Kakuna', 'Beedrill', 'Pidgey', 'Pidgeotto', 'Pidgeot', 'Rattata', 'Raticate', 'Pikachu', 'Raichu', 'Sandshrew', 'Sandslash', 'Nidoran', 'Nidorina', 'Nidoqueen', 'Nidorino', 'Nidoking', 'Clefairy', 'Clefable', 'Vulpix', 'Ninetales', 'Jigglypuff', 'Wigglytuff', 'Zubat', 'Golbat', 'Oddish', 'Gloom', 'Vileplume', 'Paras', 'Parasect', 'Venonat', 'Venomoth', 'Diglett', 'Dugtrio', 'Meowth', 'Persian', 'Psyduck', 'Golduck', 'Mankey', 'Primeape', 'Growlithe', 'Arcanine', 'Poliwag', 'Poliwhirl', 'Poliwrath', 'Abra', 'Kadabra', 'Alakazam', 'Machop', 'Machoke', 'Machamp', 'Bellsprout', 'Weepinbell', 'Victreebel', 'Tentacool', 'Tentacruel', 'Geodude', 'Graveler', 'Golem', 'Ponyta', 'Rapidash', 'Slowpoke', 'Slowbro', 'Magnemite', 'Magneton', 'Farfetchd', 'Doduo', 'Dodrio', 'Seel', 'Dewgong', 'Grimer', 'Muk', 'Shellder', 'Cloyster', 'Gastly', 'Haunter', 'Gengar', 'Onix', 'Drowzee', 'Hypno', 'Krabby', 'Kingler', 'Voltorb', 'Electrode', 'Exeggcute', 'Exeggutor', 'Cubone', 'Marowak', 'Hitmonlee', 'Hitmonchan', 'Lickitung', 'Koffing', 'Weezing', 'Rhyhorn', 'Rhydon', 'Chansey', 'Tangela', 'Kangaskhan', 'Horsea', 'Seadra', 'Goldeen', 'Seaking', 'Staryu', 'Starmie', 'MrMime', 'Scyther', 'Jynx', 'Electabuzz', 'Magmar', 'Pinsir', 'Tauros', 'Magikarp', 'Gyarados', 'Lapras', 'Ditto', 'Eevee', 'Vaporeon', 'Jolteon', 'Flareon', 'Porygon', 'Omanyte', 'Omastar', 'Kabuto', 'Kabutops', 'Aerodactyl', 'Snorlax', 'Articuno', 'Zapdos', 'Moltres', 'Dratini', 'Dragonair', 'Dragonite', 'Mewtwo', 'Mew', 'Chikorita', 'Bayleef', 'Meganium', 'Cyndaquil', 'Quilava', 'Typhlosion', 'Totodile', 'Croconaw', 'Feraligatr', 'Sentret', 'Furret', 'Hoothoot', 'Noctowl', 'Ledyba', 'Ledian', 'Spinarak', 'Ariados', 'Crobat', 'Chinchou', 'Lanturn', 'Pichu', 'Cleffa', 'Igglybuff', 'Togepi', 'Togetic', 'Natu', 'Xatu', 'Mareep', 'Flaaffy', 'Ampharos', 'Bellossom', 'Marill', 'Azumarill', 'Sudowoodo', 'Politoed', 'Hoppip', 'Skiploom', 'Jumpluff', 'Aipom', 'Sunkern', 'Sunflora', 'Yanma', 'Woobat', 'Swoobat', 'Pineco', 'Forretress', 'Dunsparce', 'Gligar', 'Steelix', 'Snubbull', 'Granbull', 'Qwilfish', 'Scizor', 'Shuckle', 'Heracross', 'Sneasel', 'Teddiursa', 'Ursaring', 'Slugma', 'Magcargo', 'Swinub', 'Piloswine', 'Corsola', 'Remoraid', 'Octillery', 'Delibird', 'Mantine', 'Skarmory', 'Houndour', 'Houndoom', 'Kingdra', 'Phanpy', 'Donphan', 'Porygon2', 'Stantler', 'Smeargle', 'Tyrogue', 'Hitmontop', 'Smoochum', 'Elekid', 'Magby', 'Miltank', 'Blissey', 'Raikou', 'Entei', 'Suicune', 'Larvitar', 'Pupitar', 'Tyranitar', 'Lugia', 'HoOh', 'Celebi', 'Treecko', 'Grovyle', 'Sceptile', 'Torchic', 'Combusken', 'Blaziken', 'Mudkip', 'Marshtomp', 'Swampert', 'Poochyena', 'Mightyena', 'Zigzagoon', 'Linoone', 'Wurmple', 'Silcoon', 'Beautifly', 'Cascoon', 'Dustox', 'Lotad', 'Lombre', 'Ludicolo', 'Seedot', 'Nuzleaf', 'Shiftry', 'Taillow', 'Swellow', 'Wingull', 'Pelipper', 'Ralts', 'Kirlia', 'Gardevoir', 'Surskit', 'Masquerain', 'Shroomish', 'Breloom', 'Slakoth', 'Vigoroth', 'Slaking', 'Nincada', 'Ninjask', 'Shedinja', 'Whismur', 'Loudred', 'Exploud', 'Makuhita', 'Hariyama', 'Azurill', 'Nosepass', 'Skitty', 'Delcatty', 'Sableye', 'Mawile', 'Aron', 'Lairon', 'Aggron', 'Meditite', 'Medicham', 'Electrike', 'Manectric', 'Plusle', 'Minccino', 'Cinccino', 'Roselia', 'Roserade', 'Glalie', 'Spheal', 'Sealeo', 'Walrein', 'Clamperl', 'Huntail', 'Gorebyss', 'Absol', 'Snorunt', 'Froslass', 'Rotom', 'Uxie', 'Mesprit', 'Azelf', 'Dialga', 'Palkia', 'Heatran', 'Regigigas', 'Giratina', 'Cresselia', 'Phione', 'Manaphy', 'Darkrai', 'Shaymin', 'Arceus'
+      ];
+
+      const MOVE_NAMES = [
+        'Tackle', 'Thunderbolt', 'Flamethrower', 'Surf', 'Vine Whip', 'Ice Beam', 'Earthquake', 'Psychic', 'Shadow Ball', 'Aerial Ace', 'Focus Blast', 'Solar Beam', 'Dragon Claw', 'Dark Pulse', 'Stone Edge', 'Flash Cannon', 'Moonblast', 'Waterfall', 'Leaf Storm', 'Thunder Punch', 'Fire Blast', 'Hydro Pump', 'Giga Drain', 'Blizzard', 'Hyper Beam', 'Close Combat', 'Iron Tail', 'Air Slash', 'Sucker Punch', 'Sludge Bomb', 'Cross Chop', 'Power Gem', 'Play Rough', 'Ice Punch', 'Wild Charge', 'Brave Bird', 'Aura Sphere', 'Scald', 'Dazzling Gleam', 'Earth Power', 'Ancient Power', 'Poison Jab', 'Seed Bomb', 'Crunch', 'Foul Play', 'Heat Wave', 'Mist Ball', 'Shadow Sneak', 'XScissor', 'Roost', 'Protect', 'Rapid Spin', 'Endeavor', 'Recover', 'Leech Seed', 'WillOWisp', 'Thunder Wave', 'Sleep Powder', 'Explosion', 'Outrage', 'Last Resort', 'Drain Punch', 'Belly Drum', 'Return', 'Double Edge', 'Facade', 'Knock Off', 'Rock Slide', 'Superpower', 'Zen Headbutt', 'Flash', 'Bubble Beam', 'Shell Smash', 'Night Slash', 'Muddy Water', 'Acrobatics', 'Rock Tomb', 'Iron Defense', 'Heavy Slam', 'Gyro Ball', 'Zap Cannon', 'Sweet Scent', 'Sky Attack', 'Crabhammer', 'Tri Attack', 'Double Hit', 'Meteor Mash', 'Shadow Punch', 'Swords Dance', 'Defog', 'Taunt', 'Substitute', 'Sonic Boom', 'Power Whip', 'Hex', 'Discharge', 'Overheat', 'Iron Head', 'Psychic Fangs'
+      ];
+
+      const ITEM_NAMES = [
+        'Expert Belt', 'Life Orb', 'Choice Scarf', 'Choice Specs', 'Leftovers', 'Assault Vest', 'Sitrus Berry', 'Weakness Policy', 'Black Sludge', 'Muscle Band', 'Wise Glasses', 'Heavy Duty Boots', 'Eject Button', 'King\'s Rock', 'Toxic Orb', 'Flame Orb', 'Quick Claw', 'Focus Sash', 'Mental Herb', 'Lum Berry', 'Air Balloon', 'Big Root', 'White Herb', 'Power Herb', 'Dragon Fang', 'Poison Barb', 'Sharp Beak', 'Silver Powder', 'Mystic Water', 'Zap Plate', 'Earth Plate', 'Soft Sand', 'Hard Stone', 'Adrenaline Orb', 'Everstone', 'Berry Juice', 'Mago Berry', 'Iapapa Berry', 'Shed Shell', 'Pomeg Berry', 'Persim Berry', 'Tamato Berry', 'Rindo Berry', 'Eviolite', 'Petaya Berry', 'Apple Juice'
+      ];
+
+      const ABILITY_NAMES = [
+        'Static', 'Overgrow', 'Torrent', 'Blaze', 'Levitate', 'Pressure', 'Intimidate', 'Swift Swim', 'Flash Fire', 'Volt Absorb', 'Shed Skin', 'Battle Armor', 'Technician', 'Adaptability', 'Speed Boost', 'Moxie', 'Drought', 'Drizzle', 'Sand Veil', 'Wonder Guard', 'Compound Eyes', 'Shadow Tag', 'Defiant', 'Toxic Boost', 'Mold Breaker', 'Vital Spirit', 'Rough Skin', 'Cute Charm', 'Storm Drain', 'Motor Drive', 'Guts', 'Magnet Pull', 'Flare Boost', 'Sniper', 'Shell Armor', 'Contrary', 'Limber', 'Multiscale', 'Filter', 'Insomnia', 'Color Change', 'Solid Rock', 'Iron Fist', 'Run Away', 'Steadfast', 'Prankster', 'Arena Trap', 'No Guard', 'Big Pecks', 'Unnerve', 'Cursed Body', 'Reckless', 'Huge Power', 'Leaf Guard', 'Inner Focus', 'Skill Link', 'Healer', 'Dry Skin', 'Poison Point', 'Regen', 'Magic Guard'
+      ];
+
+      const TYPES = ['Normal', 'Fire', 'Water', 'Electric', 'Grass', 'Ice', 'Fighting', 'Poison', 'Ground', 'Flying', 'Psychic', 'Bug', 'Rock', 'Ghost', 'Dragon', 'Dark', 'Steel', 'Fairy'];
+      const STAT_KEYS = ['hp', 'attack', 'defense', 'specialAttack', 'specialDefense', 'speed'];
+
+      function generatePokemonCatalog() {
+        const list = [];
+        for (let i = 0; i < POKEMON_COUNT; i++) {
+          const baseName = BASE_NAMES[i % BASE_NAMES.length] || `Pokémon ${i + 1}`;
+          const suffix = i >= BASE_NAMES.length ? ` ${Math.floor(i / BASE_NAMES.length) + 1}` : '';
+          const typeA = TYPES[i % TYPES.length];
+          const typeB = TYPES[(i * 3 + 5) % TYPES.length];
+          const stats = {};
+          for (const key of STAT_KEYS) stats[key] = 40 + ((i * 17 + key.length * 13) % 150);
+          list.push({
+            id: i + 1,
+            name: `${baseName}${suffix}`,
+            types: [typeA, typeB],
+            sprite: ['⚡', '🌿', '🔥', '💧', '🧊', '🌋', '✨', '🦊', '🐉', '🌙'][i % 10],
+            stats,
+            abilityId: (i * 7 + 3) % ABILITY_COUNT + 1,
+            moveIds: [
+              (i * 11 + 3) % MOVE_COUNT + 1,
+              (i * 17 + 5) % MOVE_COUNT + 1,
+              (i * 23 + 7) % MOVE_COUNT + 1,
+              (i * 29 + 9) % MOVE_COUNT + 1
+            ]
+          });
+        }
+        return list;
+      }
+
+      function generateMoveCatalog() {
+        const list = [];
+        for (let i = 0; i < MOVE_COUNT; i++) {
+          list.push({
+            id: i + 1,
+            name: MOVE_NAMES[i % MOVE_NAMES.length] || `Move ${i + 1}`,
+            type: TYPES[i % TYPES.length],
+            power: 30 + (i % 80),
+            accuracy: 80 + (i % 21),
+            category: ['physical', 'special', 'status'][i % 3],
+            priority: i % 4 === 0 ? 1 : 0,
+            pp: 10 + (i % 18)
+          });
+        }
+        return list;
+      }
+
+      function generateItemCatalog() {
+        const list = [];
+        for (let i = 0; i < ITEM_COUNT; i++) {
+          list.push({
+            id: i + 1,
+            name: ITEM_NAMES[i % ITEM_NAMES.length] || `Item ${i + 1}`,
+            effect: ['Attack', 'Defense', 'Speed', 'HP', 'Focus', 'Utility'][i % 6],
+            bonus: 6 + (i % 12)
+          });
+        }
+        return list;
+      }
+
+      function generateAbilityCatalog() {
+        const list = [];
+        for (let i = 0; i < ABILITY_COUNT; i++) {
+          list.push({
+            id: i + 1,
+            name: ABILITY_NAMES[i % ABILITY_NAMES.length] || `Ability ${i + 1}`,
+            boost: 4 + (i % 15)
+          });
+        }
+        return list;
+      }
+
+      const pokemonCatalog = generatePokemonCatalog();
+      const moveCatalog = generateMoveCatalog();
+      const itemCatalog = generateItemCatalog();
+      const abilityCatalog = generateAbilityCatalog();
+
+      const state = { playerTeam: [], botTeam: [], battleRunning: false };
+
+      function getPokemonById(id) {
+        return pokemonCatalog.find((p) => p.id === Number(id)) || pokemonCatalog[0];
+      }
+      function getMoveById(id) { return moveCatalog.find((m) => m.id === Number(id)) || moveCatalog[0]; }
+      function getItemById(id) { return itemCatalog.find((i) => i.id === Number(id)) || itemCatalog[0]; }
+      function getAbilityById(id) { return abilityCatalog.find((a) => a.id === Number(id)) || abilityCatalog[0]; }
+
+      function getMoveIdForPokemon(pokemon, index) {
+        const offset = (pokemon.id * (index + 2) * 17) % moveCatalog.length;
+        return moveCatalog[offset].id;
+      }
+
+      function getRandomTeam(typeKey) {
+        const team = [];
+        const seen = new Set();
+        while (team.length < MAX_TEAM_SIZE) {
+          const randomId = Math.floor(Math.random() * pokemonCatalog.length) + 1;
+          if (seen.has(randomId)) continue;
+          seen.add(randomId);
+          const pokemon = getPokemonById(randomId);
+          team.push({
+            pokemonId: pokemon.id,
+            itemId: itemCatalog[(randomId * 7 + (typeKey === 'bot' ? 3 : 1)) % itemCatalog.length].id,
+            abilityId: abilityCatalog[(randomId * 13 + (typeKey === 'bot' ? 5 : 2)) % abilityCatalog.length].id,
+            moveIds: [
+              getMoveIdForPokemon(pokemon, 1),
+              getMoveIdForPokemon(pokemon, 2),
+              getMoveIdForPokemon(pokemon, 3),
+              getMoveIdForPokemon(pokemon, 4)
+            ],
+            hp: pokemon.stats.hp
+          });
+        }
+        return team;
+      }
+
+      function renderMoveOptions(selectedId) {
+        return moveCatalog.map((move) => `<option value="${move.id}" ${Number(move.id) === Number(selectedId) ? 'selected' : ''}>${move.name}</option>`).join('');
+      }
+
+      function renderItemOptions(selectedId) {
+        return itemCatalog.map((item) => `<option value="${item.id}" ${Number(item.id) === Number(selectedId) ? 'selected' : ''}>${item.name}</option>`).join('');
+      }
+
+      function renderAbilityOptions(selectedId) {
+        return abilityCatalog.map((ability) => `<option value="${ability.id}" ${Number(ability.id) === Number(selectedId) ? 'selected' : ''}>${ability.name}</option>`).join('');
+      }
+
+      function renderTeamBoard(teamKey) {
+        const board = document.getElementById(`${teamKey}-team`);
+        const team = state[teamKey];
+        board.innerHTML = team.map((entry, index) => {
+          const pokemon = getPokemonById(entry.pokemonId);
+          return `
+            <div class="team-card">
+              <div class="card-head">
+                <span class="card-badge">${index + 1}</span>
+                <span class="card-name">${pokemon.name}</span>
+              </div>
+
+              <div>
+                <label class="label">Pokémon</label>
+                <select data-team="${teamKey}" data-slot="${index}" data-field="pokemon">
+                  ${pokemonCatalog.map((option) => `<option value="${option.id}" ${option.id === Number(entry.pokemonId) ? 'selected' : ''}>${option.name}</option>`).join('')}
+                </select>
+              </div>
+
+              <div class="config-row">
+                <div>
+                  <label class="label">Move 1</label>
+                  <select data-team="${teamKey}" data-slot="${index}" data-move-index="0">${renderMoveOptions(entry.moveIds[0])}</select>
+                </div>
+                <div>
+                  <label class="label">Move 2</label>
+                  <select data-team="${teamKey}" data-slot="${index}" data-move-index="1">${renderMoveOptions(entry.moveIds[1])}</select>
+                </div>
+                <div>
+                  <label class="label">Move 3</label>
+                  <select data-team="${teamKey}" data-slot="${index}" data-move-index="2">${renderMoveOptions(entry.moveIds[2])}</select>
+                </div>
+                <div>
+                  <label class="label">Move 4</label>
+                  <select data-team="${teamKey}" data-slot="${index}" data-move-index="3">${renderMoveOptions(entry.moveIds[3])}</select>
+                </div>
+              </div>
+
+              <div class="config-row">
+                <div>
+                  <label class="label">Item</label>
+                  <select data-team="${teamKey}" data-slot="${index}" data-field="item">${renderItemOptions(entry.itemId)}</select>
+                </div>
+                <div>
+                  <label class="label">Ability</label>
+                  <select data-team="${teamKey}" data-slot="${index}" data-field="ability">${renderAbilityOptions(entry.abilityId)}</select>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      function renderBattleStatus(text) {
+        document.getElementById('battle-status').textContent = text;
+      }
+
+      function updateBattleScene(playerActive, botActive) {
+        const playerName = document.getElementById('player-active-name');
+        const botName = document.getElementById('bot-active-name');
+        const playerSprite = document.getElementById('player-sprite');
+        const botSprite = document.getElementById('bot-sprite');
+        const playerHpText = document.getElementById('player-hp-text');
+        const botHpText = document.getElementById('bot-hp-text');
+        const playerHpBar = document.getElementById('player-hp-bar');
+        const botHpBar = document.getElementById('bot-hp-bar');
+
+        if (!playerActive || !botActive) {
+          playerName.textContent = '-';
+          botName.textContent = '-';
+          playerSprite.textContent = '⚡';
+          botSprite.textContent = '🌿';
+          playerHpText.textContent = '0 / 0';
+          botHpText.textContent = '0 / 0';
+          playerHpBar.style.width = '0%';
+          botHpBar.style.width = '0%';
+          return;
+        }
+
+        playerName.textContent = playerActive.name;
+        botName.textContent = botActive.name;
+        playerSprite.textContent = playerActive.sprite;
+        botSprite.textContent = botActive.sprite;
+
+        playerHpText.textContent = `${playerActive.hp} / ${playerActive.maxHp}`;
+        botHpText.textContent = `${botActive.hp} / ${botActive.maxHp}`;
+        playerHpBar.style.width = `${Math.max(0, (playerActive.hp / playerActive.maxHp) * 100)}%`;
+        botHpBar.style.width = `${Math.max(0, (botActive.hp / botActive.maxHp) * 100)}%`;
+      }
+
+      function renderMoveBar(activePokemon) {
+        const moveBar = document.getElementById('move-bar');
+        if (!activePokemon) {
+          moveBar.innerHTML = '';
+          return;
+        }
+
+        moveBar.innerHTML = activePokemon.moves.map((move) => `
+          <button class="move-chip">
+            <strong>${move.name}</strong>
+            <span>${move.type} • ${move.power} power</span>
+          </button>
+        `).join('');
+      }
+
+      function appendLog(message) {
+        const log = document.getElementById('battle-log');
+        const entry = document.createElement('div');
+        entry.className = 'log-entry';
+        entry.innerHTML = message;
+        log.prepend(entry);
+      }
+
+      function getAliveMembers(team) {
+        return team.filter((member) => !member.fainted);
+      }
+
+      function getFrontliner(team) {
+        const alive = getAliveMembers(team);
+        if (!alive.length) return null;
+        return alive.sort((a, b) => b.speed - a.speed)[0];
+      }
+
+      function getBattleMember(entry) {
+        const pokemon = getPokemonById(entry.pokemonId);
+        const item = getItemById(entry.itemId);
+        const ability = getAbilityById(entry.abilityId);
+        const totalHp = pokemon.stats.hp + item.bonus + ability.boost;
+        return {
+          ...entry,
+          name: pokemon.name,
+          sprite: pokemon.sprite,
+          types: pokemon.types,
+          hp: totalHp,
+          maxHp: totalHp,
+          attack: pokemon.stats.attack + item.bonus + ability.boost,
+          defense: pokemon.stats.defense + Math.floor(item.bonus / 2),
+          specialAttack: pokemon.stats.specialAttack + item.bonus + ability.boost,
+          specialDefense: pokemon.stats.specialDefense + Math.floor(item.bonus / 2),
+          speed: pokemon.stats.speed + Math.floor(ability.boost / 2),
+          item,
+          ability,
+          moves: entry.moveIds.map((moveId) => getMoveById(moveId)),
+          fainted: false
+        };
+      }
+
+      function calculateTypeMultiplier(moveType, targetTypes) {
+        let multiplier = 1;
+        for (const targetType of targetTypes) {
+          const chart = TYPE_CHART[moveType] || {};
+          multiplier *= chart[targetType] || 1;
+        }
+        return multiplier;
+      }
+
+      function chooseBestMove(attacker, defender) {
+        let best = attacker.moves[0];
+        let bestScore = -Infinity;
+        for (const move of attacker.moves) {
+          const typeMultiplier = calculateTypeMultiplier(move.type, defender.types);
+          const statBias = move.category === 'special' ? attacker.specialAttack : attacker.attack;
+          const score = (move.power * typeMultiplier) + (move.priority * 20) + (statBias * 0.18);
+          if (score > bestScore) {
+            bestScore = score;
+            best = move;
+          }
+        }
+        return best;
+      }
+
+      function resolveAttack(attacker, defender, move, sourceLabel) {
+        const typeMultiplier = calculateTypeMultiplier(move.type, defender.types);
+        const crit = Math.random() < 0.12;
+        const randomFactor = 0.85 + Math.random() * 0.3;
+        const attackStat = move.category === 'special' ? attacker.specialAttack : attacker.attack;
+        const defenseStat = move.category === 'special' ? defender.specialDefense : defender.defense;
+        const baseDamage = ((2 * 100 / 5 + 2) * move.power * (attackStat / Math.max(1, defenseStat)) / 50 + 2);
+        const rawDamage = baseDamage * typeMultiplier * randomFactor * (crit ? 1.6 : 1);
+        const damage = Math.max(6, Math.round(rawDamage));
+
+        defender.hp = Math.max(0, defender.hp - damage);
+        defender.fainted = defender.hp <= 0;
+
+        appendLog(`${sourceLabel} ${attacker.name} used <strong>${move.name}</strong> for ${damage} damage${crit ? ' (critical!)' : ''}.`);
+        if (typeMultiplier > 1) appendLog('It was super effective!');
+        if (typeMultiplier < 1 && typeMultiplier > 0) appendLog('It was not very effective...');
+        if (typeMultiplier === 0) appendLog('It had no effect!');
+        if (defender.hp <= 0) appendLog(`${defender.name} fainted!`);
+      }
+
+      function syncTeamEntry(teamKey, slotIndex, field, value) {
+        const team = state[teamKey];
+        if (!team[slotIndex]) return;
+
+        if (field === 'pokemon') {
+          const pokemon = getPokemonById(value);
+          team[slotIndex].pokemonId = Number(value);
+          team[slotIndex].moveIds = [
+            getMoveIdForPokemon(pokemon, 1),
+            getMoveIdForPokemon(pokemon, 2),
+            getMoveIdForPokemon(pokemon, 3),
+            getMoveIdForPokemon(pokemon, 4)
+          ];
+          team[slotIndex].abilityId = abilityCatalog[(pokemon.id * 13 + 5) % abilityCatalog.length].id;
+          team[slotIndex].itemId = itemCatalog[(pokemon.id * 7 + 3) % itemCatalog.length].id;
+        }
+
+        if (field === 'item') team[slotIndex].itemId = Number(value);
+        if (field === 'ability') team[slotIndex].abilityId = Number(value);
+        if (field === 'move') team[slotIndex].moveIds[Number(value.index)] = Number(value.moveId);
+
+        renderTeamBoard('player');
+        renderTeamBoard('bot');
+      }
+
+      async function runBattle() {
+        if (state.battleRunning) return;
+        state.battleRunning = true;
+        document.getElementById('battle-log').innerHTML = '';
+        renderBattleStatus('Battle started! The arena is live.');
+
+        const playerTeam = state.playerTeam.map(getBattleMember);
+        const botTeam = state.botTeam.map(getBattleMember);
+
+        let round = 1;
+        while (true) {
+          const playerActive = getFrontliner(playerTeam);
+          const botActive = getFrontliner(botTeam);
+          if (!playerActive || !botActive) break;
+
+          const playerMove = chooseBestMove(playerActive, botActive);
+          const botMove = chooseBestMove(botActive, playerActive);
+
+          const actionOrder = [
+            { side: 'player', actor: playerActive, move: playerMove, target: botActive },
+            { side: 'bot', actor: botActive, move: botMove, target: playerActive }
+          ].sort((a, b) => b.actor.speed - a.actor.speed);
+
+          for (const action of actionOrder) {
+            if (action.actor.fainted || action.target.fainted) continue;
+            resolveAttack(action.actor, action.target, action.move, action.side === 'player' ? 'Player' : 'Bot');
+            updateBattleScene(getFrontliner(playerTeam), getFrontliner(botTeam));
+            renderMoveBar(getFrontliner(playerTeam));
+            renderBattleStatus(`Round ${round}: ${getFrontliner(playerTeam)?.name || '—'} vs ${getFrontliner(botTeam)?.name || '—'}`);
+            await new Promise((resolve) => setTimeout(resolve, 700));
+
+            if (action.target.fainted) {
+              const replacement = getFrontliner(action.side === 'player' ? playerTeam : botTeam);
+              if (replacement && replacement !== action.target) {
+                appendLog(`${action.side === 'player' ? 'Player' : 'Bot'} sends out <strong>${replacement.name}</strong>!`);
+              }
+            }
+          }
+
+          round += 1;
+          if (getAliveMembers(playerTeam).length === 0 || getAliveMembers(botTeam).length === 0) break;
+        }
+
+        const remainingPlayer = getAliveMembers(playerTeam).length;
+        const remainingBot = getAliveMembers(botTeam).length;
+
+        if (remainingPlayer > remainingBot) {
+          renderBattleStatus('Victory! You outlasted the bot team.');
+          appendLog(`<strong>Final result:</strong> Player wins with ${remainingPlayer} Pokémon remaining.`);
+        } else if (remainingBot > remainingPlayer) {
+          renderBattleStatus('Defeat. The bot team took the win.');
+          appendLog(`<strong>Final result:</strong> Bot wins with ${remainingBot} Pokémon remaining.`);
+        } else {
+          renderBattleStatus('Draw! Both teams held their ground.');
+          appendLog('<strong>Final result:</strong> Draw game.');
+        }
+
+        updateBattleScene(getFrontliner(playerTeam), getFrontliner(botTeam));
+        state.battleRunning = false;
+      }
+
+      function randomizePlayer() {
+        state.playerTeam = getRandomTeam('player');
+        renderTeamBoard('player');
+        renderBattleStatus('Player roster refreshed.');
+      }
+
+      function randomizeBot() {
+        state.botTeam = getRandomTeam('bot');
+        renderTeamBoard('bot');
+        renderBattleStatus('Bot roster refreshed.');
+      }
+
+      function savePreset(teamKey) {
+        const key = `pokebattle:${teamKey}:preset`;
+        localStorage.setItem(key, JSON.stringify(state[teamKey]));
+        renderBattleStatus(`${teamKey === 'player' ? 'Player' : 'Bot'} preset saved.`);
+      }
+
+      function loadPreset(teamKey) {
+        const key = `pokebattle:${teamKey}:preset`;
+        const raw = localStorage.getItem(key);
+        if (!raw) {
+          renderBattleStatus('No saved preset found.');
+          return;
+        }
+        state[teamKey] = JSON.parse(raw);
+        renderTeamBoard(teamKey);
+        renderBattleStatus(`${teamKey === 'player' ? 'Player' : 'Bot'} preset loaded.`);
+      }
+
+      function initState() {
+        state.playerTeam = getRandomTeam('player');
+        state.botTeam = getRandomTeam('bot');
+        renderTeamBoard('player');
+        renderTeamBoard('bot');
+        updateBattleScene(null, null);
+      }
+
+      document.addEventListener('change', (event) => {
+        const target = event.target;
+        if (!target.matches('select')) return;
+
+        const teamKey = target.dataset.team;
+        const slotIndex = Number(target.dataset.slot);
+
+        if (target.dataset.field === 'pokemon') {
+          syncTeamEntry(teamKey, slotIndex, 'pokemon', Number(target.value));
+          return;
+        }
+        if (target.dataset.field === 'item') {
+          syncTeamEntry(teamKey, slotIndex, 'item', Number(target.value));
+          return;
+        }
+        if (target.dataset.field === 'ability') {
+          syncTeamEntry(teamKey, slotIndex, 'ability', Number(target.value));
+          return;
+        }
+        if (target.dataset.moveIndex !== undefined) {
+          syncTeamEntry(teamKey, slotIndex, 'move', {
+            index: Number(target.dataset.moveIndex),
+            moveId: Number(target.value)
+          });
+        }
+      });
+
+      document.getElementById('randomize-player').addEventListener('click', randomizePlayer);
+      document.getElementById('randomize-bot').addEventListener('click', randomizeBot);
+      document.getElementById('battle-btn').addEventListener('click', runBattle);
+      document.getElementById('save-player').addEventListener('click', () => savePreset('player'));
+      document.getElementById('load-player').addEventListener('click', () => loadPreset('player'));
+
+      initState();
+      renderBattleStatus('Pick your six and challenge the bot team.');
+      appendLog('<strong>System:</strong> The Pokédex builder is ready. Build your squad and battle!');
+      appendLog('<strong>Tip:</strong> Save your favorite six before starting a match.');
+    </script>
   </body>
 </html>
