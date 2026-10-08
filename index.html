@@ -9,55 +9,104 @@
   <body>
     <div class="app-shell">
       <header class="topbar">
-        <div>
-          <p class="eyebrow">Game Builder</p>
+        <div class="brand-wrap">
+          <p class="eyebrow">Pokédex Builder</p>
           <h1>PokéBattle Universe</h1>
         </div>
-        <div class="stats-bar">
-          <div class="stat-pill">
-            <span>Pokémon</span>
-            <strong id="pokemon-count">1025</strong>
+
+        <div class="top-actions">
+          <div class="stats-bar">
+            <div class="stat-pill">
+              <span>Pokémon</span>
+              <strong>1025</strong>
+            </div>
+            <div class="stat-pill">
+              <span>Moves</span>
+              <strong>934</strong>
+            </div>
+            <div class="stat-pill">
+              <span>Items</span>
+              <strong>571</strong>
+            </div>
           </div>
-          <div class="stat-pill">
-            <span>Moves</span>
-            <strong id="moves-count">934</strong>
-          </div>
-          <div class="stat-pill">
-            <span>Items</span>
-            <strong id="items-count">571</strong>
+
+          <div class="action-row">
+            <button id="randomize-player" class="secondary-btn">Randomize Player</button>
+            <button id="randomize-bot" class="secondary-btn">Randomize Bot</button>
+            <button id="battle-btn" class="primary-btn">Battle</button>
           </div>
         </div>
       </header>
 
       <main class="game-layout">
-        <section class="team-panel">
-          <div class="panel-header">
+        <aside class="panel team-panel left-panel">
+          <div class="panel-head">
             <h2>Your Team</h2>
-            <button id="randomize-player" class="secondary-btn">Randomize Team</button>
+            <button id="save-player" class="mini-btn">Save</button>
           </div>
-          <div id="player-team" class="team-slots"></div>
-        </section>
+          <div id="player-team" class="team-grid"></div>
+        </aside>
 
         <section class="battle-panel">
-          <div class="battle-controls">
-            <button id="battle-btn" class="primary-btn">Battle Bot</button>
-            <button id="randomize-bot" class="secondary-btn">Bot Team</button>
+          <div class="battle-status" id="battle-status">Pick your six and challenge the bot team.</div>
+
+          <div class="battle-arena">
+            <div class="duel-card player-side">
+              <div class="duel-header">
+                <span class="tag">Player</span>
+                <strong id="player-active-name">-</strong>
+              </div>
+
+              <div class="battle-sprite player-sprite" id="player-sprite">⚡</div>
+
+              <div class="hp-block">
+                <div class="hp-row">
+                  <span>HP</span>
+                  <span id="player-hp-text">0 / 0</span>
+                </div>
+                <div class="hp-bar">
+                  <span id="player-hp-bar"></span>
+                </div>
+              </div>
+            </div>
+
+            <div class="versus">VS</div>
+
+            <div class="duel-card bot-side">
+              <div class="duel-header">
+                <span class="tag alt">Bot</span>
+                <strong id="bot-active-name">-</strong>
+              </div>
+
+              <div class="battle-sprite bot-sprite" id="bot-sprite">🌿</div>
+
+              <div class="hp-block">
+                <div class="hp-row">
+                  <span>HP</span>
+                  <span id="bot-hp-text">0 / 0</span>
+                </div>
+                <div class="hp-bar enemy-bar">
+                  <span id="bot-hp-bar"></span>
+                </div>
+              </div>
+            </div>
           </div>
 
-          <div id="battle-summary" class="battle-summary empty">
-            Choose your squads and start the match.
-          </div>
+          <div class="move-bar" id="move-bar"></div>
 
-          <div id="battle-log" class="battle-log"></div>
+          <div class="battle-log-wrap">
+            <div class="battle-log-header">Battle log</div>
+            <div id="battle-log" class="battle-log"></div>
+          </div>
         </section>
 
-        <section class="team-panel">
-          <div class="panel-header">
+        <aside class="panel team-panel right-panel">
+          <div class="panel-head">
             <h2>Bot Team</h2>
-            <button id="randomize-bot-team" class="secondary-btn">Randomize Bot</button>
+            <button id="load-player" class="mini-btn">Load</button>
           </div>
-          <div id="bot-team" class="team-slots"></div>
-        </section>
+          <div id="bot-team" class="team-grid"></div>
+        </aside>
       </main>
     </div>
 
