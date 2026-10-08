@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PokéBattle Universe</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">Game Builder</p>
+          <h1>PokéBattle Universe</h1>
+        </div>
+        <div class="stats-bar">
+          <div class="stat-pill">
+            <span>Pokémon</span>
+            <strong id="pokemon-count">1025</strong>
+          </div>
+          <div class="stat-pill">
+            <span>Moves</span>
+            <strong id="moves-count">934</strong>
+          </div>
+          <div class="stat-pill">
+            <span>Items</span>
+            <strong id="items-count">571</strong>
+          </div>
+        </div>
+      </header>
+
+      <main class="game-layout">
+        <section class="team-panel">
+          <div class="panel-header">
+            <h2>Your Team</h2>
+            <button id="randomize-player" class="secondary-btn">Randomize Team</button>
+          </div>
+          <div id="player-team" class="team-slots"></div>
+        </section>
+
+        <section class="battle-panel">
+          <div class="battle-controls">
+            <button id="battle-btn" class="primary-btn">Battle Bot</button>
+            <button id="randomize-bot" class="secondary-btn">Bot Team</button>
+          </div>
+
+          <div id="battle-summary" class="battle-summary empty">
+            Choose your squads and start the match.
+          </div>
+
+          <div id="battle-log" class="battle-log"></div>
+        </section>
+
+        <section class="team-panel">
+          <div class="panel-header">
+            <h2>Bot Team</h2>
+            <button id="randomize-bot-team" class="secondary-btn">Randomize Bot</button>
+          </div>
+          <div id="bot-team" class="team-slots"></div>
+        </section>
+      </main>
+    </div>
+
+    <script src="app.js"></script>
+  </body>
+</html>
